@@ -42,7 +42,9 @@ the logs you can see everything that happened.
 ## app
 
 All the files specific to running this application are kept here. __main.go__ loads the application bootstrapping 
-code found in __app.go__.
+code found in __app.go__. I would also prefer you focus on the files here rather than in __common__. These are the 
+files I have been working on in order to provide the solution for you. I have included the __common__ files in order
+to save a little time, but also demonstrate how I usually structure projects.
 
 ### data
 
@@ -60,3 +62,10 @@ specific middlewares.
 ### service
 
 The services (or controllers) are kept here. They are invoked from the handlers or other services.
+
+## db
+
+Where the db migrations are stored. I prefer to use a library like __goose__ to use raw SQL migrations than
+some ORM auto-creating magic. This is especially important when you want to define exactly how things should be
+created (foreign key constraints, unique constraints, potentially triggers). I also feel it's a lot safer, I have
+had some bad experiences with the code based generators.

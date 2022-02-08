@@ -11,6 +11,7 @@ import (
 func main() {
 	// Parse switches
 	verbose := flag.Bool("verbose", false, "Enable verbose output")
+	rollback := flag.Bool("rollback-migration", false, "Rollback last migration")
 
 	flag.Parse()
 
@@ -20,6 +21,9 @@ func main() {
 	defer logClose()
 	cleanup := boot.Core()
 	defer cleanup()
+
+	// Db init
+	boot.Sqlite3(*rollback)
 
 	// App
 	a := &app.Application{}

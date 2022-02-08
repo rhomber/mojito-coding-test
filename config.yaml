@@ -14,4 +14,4 @@ logger:
   #format: "json"
 
 db:
-  file: database
+  file: ./app.db

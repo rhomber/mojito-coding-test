@@ -6,5 +6,8 @@
 # misc
 .DS_Store
 
+# db
+app.db
+
 /mojito-coding-test
 /main
