@@ -1,0 +1,17 @@
+env: local
+
+http:
+  addr: "localhost:8080"
+  timeout: "60s"
+  shutdown:
+    waitTimeOut: "120s"
+  logging: false
+
+panic:
+  debug: true
+
+logger:
+  #format: "json"
+
+db:
+  file: database
