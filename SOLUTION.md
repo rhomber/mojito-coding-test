@@ -2,33 +2,35 @@
 
 This document attempts to explain the choices made in providing this solution.
 
-# common
+# Structure
+
+## common
 
 The first thing you may have noticed is a package called __common__, this is where I have placed all the common
 libraries. I usually build micro-service based architectures which pull in common resources (usually included using
 a __private__ directory with git submodules). So the files within __common__ are essentially a cut down version of 
 the __core__ library I use in my personal projects.
 
-## boot
+### boot
 
 A means of booting a go project, the purpose is to reduce boiler-plate code in the projects _main.go_ file. I also
 find this really useful to ensure certain things are always done (i.e. allocating enough resources).
 
-## chttp
+### chttp
 
 Extended (chi) functionality for HTTP request handling. I primarily do this as a means to reduce repeated boiler-plate
 code for passing resources around.
 
-## config
+### config
 
 Extended (viper) functionality for reading a config file as well as environment variables. I like to prefix my
-environment variables with GO_APP_ to avoid collisions (in the same way that React App does).
+environment variables with __GO_APP___ to avoid collisions (in the same way that React App does).
 
-## data
+### data
 
 High level data structures / types.
 
-## errs
+### errs
 
 A simple error framework which is used to expose special error codes and rich data structures. When I first implemented
 this Go didn't have error wrapping (or perhaps I wasn't aware of it). I would probably have designed this differently
@@ -37,3 +39,24 @@ experience to be better for the end user. I also like to expose _correlation id'
 as well. The idea being a _correlation id_ is carried throughout a request, through all micro-services. So when you scan 
 the logs you can see everything that happened.
 
+## app
+
+All the files specific to running this application are kept here. __main.go__ loads the application bootstrapping 
+code found in __app.go__.
+
+### data
+
+The application specific data entities (including models) and types are stored here. I like to use the same approach
+as Java with my models, I use DTO's. There are several reasons I prefer to use DTO's, but the primary reason
+is for security. You won't accidentally serialise a model and send sensitive information if you're using DTO's. 
+Another big reason is for performance, it's often desirable to combine information from several modals together.
+To bridge models and DTO's I use adapters, which is also a fairly normal pattern from Java.
+
+### handler
+
+The API handlers are kept here (exposing the view). Here we also store the health check's and any other application
+specific middlewares.
+
+### service
+
+The services (or controllers) are kept here. They are invoked from the handlers or other services.
