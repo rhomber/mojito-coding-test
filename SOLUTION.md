@@ -2,6 +2,16 @@
 
 This document attempts to explain the choices made in providing this solution.
 
+# General
+
+## README
+
+The __README__ file contains the relevant notes needed to build and run the project.
+
+## Postman Collection
+
+I have saved an export of a __Postman__ collection you can use to test the project under the __testing__ directory.
+
 # Structure
 
 ## common
@@ -74,3 +84,31 @@ Also, I would like to mention that I usually use PostgreSQL (and CockroachDb), s
 rewrite of go-pg that supports cockroachdb). This is my first time using sqlite3, and I haven't really used GORM
 before either. I would have also used int64 (or uint64) for the ID's as well, but GORM defaults to uint so I went
 with it (but would have created my own solution if this were a real scenario).
+
+# Technical Notes
+
+## Users
+
+The requirements didn't mention a user service, but I felt it would be better to provide something simple (for 
+better db schema design). See the __Postman__ collection for examples on how to create and query users.
+
+## Authentication
+
+The requirements didn't mention an authentication system, but I took the liberty of implementing a very rustic one.
+I felt it better demonstrated how I would lay the project out. This simple authentication system (which doesn't
+authenticate) works by setting a header called __X-User-Auth__ to the user's email address. Authentication is only 
+enabled on the __/v1/auction/lot/{id}/bid__ endpoints. Usually I would prefer to use something like JWT.
+
+## Auction Lot Bid
+
+### Db Tables
+
+I opted for storing the bids in two different tables vs. one. My reason for doing this was I felt to honor the
+requirement of auditing the bids, I wanted the data to be immutable. I also wanted to add a new bid record to the
+bid table when the __max bid__ value caused the original bid to be incremented. To make sense of these dynamic bids
+I have also introduced a __type__ column to distinguish between __user__ generated bids and __max bid__ generated bids.
+
+## Testing
+
+As the project took considerably longer than I was expecting I have opted for adding unit tests only to one service.
+I feel that regardless of time constraints code such as this, with many possible outcomes, should be thoroughly tested.

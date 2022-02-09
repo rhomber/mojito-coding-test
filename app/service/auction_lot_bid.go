@@ -126,7 +126,7 @@ func (s *AuctionLotBid) Create(db *gorm.DB, auth cdto.Auth, auctionLotId uint,
 		return dto.CreateAuctionLotBidResult{}, err
 	}
 
-	// Verify Bid
+	/// Verify Bid
 	curBid, err := s.FindCurrentBid(db, auctionLotId)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
