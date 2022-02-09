@@ -1,6 +1,7 @@
 package service
 
 import (
+	"errors"
 	"gopkg.in/go-playground/validator.v9"
 	"gorm.io/gorm"
 	"mojito-coding-test/common/config"
@@ -22,8 +23,9 @@ type UserAuth struct {
 func (s *UserAuth) Authenticate(db *gorm.DB, username string) (dto.Auth, error) {
 	user, err := s.User.GetByEmail(db, username)
 	if err != nil {
-		if err == gorm.ErrRecordNotFound {
-			return dto.Auth{}, errs.ErrUserAuthFailed
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return dto.Auth{}, errs.ErrUserAuthFailed.
+				WithDetails("user not found")
 		}
 
 		return dto.Auth{}, errs.ErrUserAuthFailed.

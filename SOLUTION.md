@@ -69,3 +69,8 @@ Where the db migrations are stored. I prefer to use a library like __goose__ to 
 some ORM auto-creating magic. This is especially important when you want to define exactly how things should be
 created (foreign key constraints, unique constraints, potentially triggers). I also feel it's a lot safer, I have
 had some bad experiences with the code based generators.
+
+Also, I would like to mention that I usually use PostgreSQL (and CockroachDb), so I prefer to use go-pg (and my 
+rewrite of go-pg that supports cockroachdb). This is my first time using sqlite3, and I haven't really used GORM
+before either. I would have also used int64 (or uint64) for the ID's as well, but GORM defaults to uint so I went
+with it (but would have created my own solution if this were a real scenario).

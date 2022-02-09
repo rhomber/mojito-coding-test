@@ -15,3 +15,6 @@ logger:
 
 db:
   file: ./app.db
+
+bid:
+  increment: 100

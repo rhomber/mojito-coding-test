@@ -20,13 +20,13 @@ type User struct {
 }
 
 func (s *User) GetByEmail(db *gorm.DB, username string) (model.User, error) {
-	var user model.User
+	var item model.User
 
-	if err := db.First(&user, "email = ?", username).Error; err != nil {
+	if err := db.First(&item, "email = ?", username).Error; err != nil {
 		return model.User{}, err
 	}
 
-	return user, nil
+	return item, nil
 }
 
 func (s *User) Create(db *gorm.DB, entityDTO dto.CreateUser) (dto.User, error) {
