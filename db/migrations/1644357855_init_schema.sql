@@ -7,10 +7,25 @@ CREATE TABLE "user"
   email TEXT NOT NULL UNIQUE,
   -- in real life (would be a secure hash):
   --password_hash TEXT NOT NULL
-  created_at TEXT NOT NULL,
-  updated_at TEXT,
-  deleted_at TEXT
+  created_at DATE NOT NULL,
+  updated_at DATE,
+  deleted_at DATE
 );
+
+CREATE TABLE "auction_lot"
+(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    start_time DATE NOT NULL,
+    end_time DATE NOT NULL,
+    -- in real life (would be a secure hash):
+    --password_hash TEXT NOT NULL
+    created_at DATE NOT NULL,
+    updated_at DATE,
+    deleted_at DATE
+);
+
 
 -- +goose Down
 DROP TABLE "user";
+DROP TABLE "auction_lot";

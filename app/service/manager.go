@@ -11,5 +11,6 @@ type Manager struct {
 	Db     *gorm.DB       `inject:""`
 
 	// Services
-	User *User `inject:""`
+	User       *User       `inject:""`
+	AuctionLot *AuctionLot `inject:""`
 }

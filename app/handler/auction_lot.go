@@ -8,16 +8,16 @@ import (
 	"net/http"
 )
 
-func GetUsers(res http.ResponseWriter, req *http.Request, ctx *chttp.Context) {
+func GetAuctionLots(res http.ResponseWriter, req *http.Request, ctx *chttp.Context) {
 	err := ctx.GetDb().Transaction(func(txn *gorm.DB) error {
 		sm := ctx.GetServiceManager().(*service.Manager)
 
-		userDTOs, err := sm.User.List(txn)
+		lotDTOs, err := sm.AuctionLot.List(txn)
 		if err != nil {
 			return err
 		}
 
-		ctx.Respond(200, userDTOs)
+		ctx.Respond(200, lotDTOs)
 
 		return nil
 	})
@@ -26,8 +26,8 @@ func GetUsers(res http.ResponseWriter, req *http.Request, ctx *chttp.Context) {
 	}
 }
 
-func PostUser(res http.ResponseWriter, req *http.Request, ctx *chttp.Context) {
-	var itemDTO dto.CreateUser
+func PostAuctionLot(res http.ResponseWriter, req *http.Request, ctx *chttp.Context) {
+	var itemDTO dto.CreateAuctionLot
 	if !ctx.MustDecode(&itemDTO) {
 		return
 	}
@@ -35,7 +35,7 @@ func PostUser(res http.ResponseWriter, req *http.Request, ctx *chttp.Context) {
 	err := ctx.GetDb().Transaction(func(txn *gorm.DB) error {
 		sm := ctx.GetServiceManager().(*service.Manager)
 
-		resDTO, err := sm.User.Create(txn, itemDTO)
+		resDTO, err := sm.AuctionLot.Create(txn, itemDTO)
 		if err != nil {
 			return err
 		}

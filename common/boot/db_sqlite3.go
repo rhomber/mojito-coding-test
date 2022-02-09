@@ -3,7 +3,6 @@ package boot
 import (
 	"database/sql"
 	"fmt"
-	_ "github.com/mattn/go-sqlite3"
 	"github.com/pkg/errors"
 	"github.com/pressly/goose/v3"
 	"gorm.io/driver/sqlite"
