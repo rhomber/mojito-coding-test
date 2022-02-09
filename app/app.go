@@ -5,6 +5,7 @@ import (
 	"gorm.io/gorm"
 	"mojito-coding-test/app/handler"
 	"mojito-coding-test/app/handler/health"
+	"mojito-coding-test/app/handler/middleware"
 	"mojito-coding-test/app/service"
 	"mojito-coding-test/common/chttp"
 	cmiddleware "mojito-coding-test/common/chttp/middleware"
@@ -63,5 +64,9 @@ func (a *Application) initPublicRoutes(r *chttp.Router, isExternal bool) {
 	r.Route("/auction/lot", func(r *chttp.Router) {
 		r.Get("/", handler.GetAuctionLots)
 		r.Post("/", handler.PostAuctionLot)
+
+		r.Route("/{id}/bid", func(r *chttp.Router) {
+			r.Use(middleware.AuthRequired)
+		})
 	})
 }

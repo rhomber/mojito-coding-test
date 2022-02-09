@@ -9,4 +9,5 @@ const (
 	CtxKeyServiceManager
 	CtxKeyOrigCorrelationId
 	CtxKeyCorrelationId
+	CtxKeyAuth
 )

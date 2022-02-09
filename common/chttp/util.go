@@ -6,6 +6,7 @@ import (
 	"github.com/sirupsen/logrus"
 	"gorm.io/gorm"
 	"mojito-coding-test/common/config"
+	"mojito-coding-test/common/data/dto"
 )
 
 func GetChiContext(ctx context.Context) *chi.Context {
@@ -76,4 +77,14 @@ func GetCorrelationId(ctx context.Context) string {
 		return v
 	}
 	return ""
+}
+
+func GetAuth(ctx context.Context) dto.Auth {
+	if ctx == nil {
+		return dto.Auth{}
+	}
+	if v, ok := ctx.Value(CtxKeyAuth).(dto.Auth); ok {
+		return v
+	}
+	return dto.Auth{}
 }

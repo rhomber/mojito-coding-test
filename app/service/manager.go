@@ -12,5 +12,6 @@ type Manager struct {
 
 	// Services
 	User       *User       `inject:""`
+	UserAuth   *UserAuth   `inject:""`
 	AuctionLot *AuctionLot `inject:""`
 }

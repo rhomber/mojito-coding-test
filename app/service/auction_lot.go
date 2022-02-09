@@ -19,7 +19,7 @@ type AuctionLot struct {
 	// Services
 }
 
-func (s *AuctionLot) Create(txn *gorm.DB, entityDTO dto.CreateAuctionLot) (dto.AuctionLot, error) {
+func (s *AuctionLot) Create(db *gorm.DB, entityDTO dto.CreateAuctionLot) (dto.AuctionLot, error) {
 	// Validate
 	if err := s.Validator.Struct(entityDTO); err != nil {
 		return dto.AuctionLot{}, errors.Wrap(err, "validation failed for creation of new auction lot")
@@ -29,19 +29,19 @@ func (s *AuctionLot) Create(txn *gorm.DB, entityDTO dto.CreateAuctionLot) (dto.A
 	entity := adapter.CreateAuctionLotDTOToModel(entityDTO)
 
 	// Insert
-	if err := txn.Create(&entity).Error; err != nil {
+	if err := db.Create(&entity).Error; err != nil {
 		return dto.AuctionLot{}, errors.Wrap(err, "error creating new auction lot")
 	}
 
 	return adapter.AuctionLotModelToDTO(entity), nil
 }
 
-func (s *AuctionLot) List(txn *gorm.DB) ([]dto.AuctionLot, error) {
+func (s *AuctionLot) List(db *gorm.DB) ([]dto.AuctionLot, error) {
 	var entities []model.AuctionLot
 
 	// Select all AuctionLots
 	// TODO: Limit to range.
-	if err := txn.Order("id ASC").Find(&entities).Error; err != nil {
+	if err := db.Order("id ASC").Find(&entities).Error; err != nil {
 		return nil, errors.Wrap(err, "error listing auction lots")
 	}
 

@@ -9,6 +9,7 @@ import (
 	"gopkg.in/yaml.v2"
 	"gorm.io/gorm"
 	"mojito-coding-test/common/config"
+	"mojito-coding-test/common/data/dto"
 	"mojito-coding-test/common/errs"
 	"net/http"
 	"strconv"
@@ -64,6 +65,10 @@ func (c *Context) GetOrigCorrelationId() string {
 
 func (c *Context) GetCorrelationId() string {
 	return GetCorrelationId(c.req.Context())
+}
+
+func (c *Context) GetAuth() dto.Auth {
+	return GetAuth(c.req.Context())
 }
 
 func (c *Context) URLParamInt(key string) (int, error) {
