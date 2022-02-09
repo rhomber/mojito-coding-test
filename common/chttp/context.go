@@ -7,6 +7,7 @@ import (
 	"github.com/go-chi/chi"
 	"github.com/sirupsen/logrus"
 	"gopkg.in/yaml.v2"
+	"gorm.io/gorm"
 	"mojito-coding-test/common/config"
 	"mojito-coding-test/common/errs"
 	"net/http"
@@ -51,6 +52,10 @@ func (c *Context) GetLogger() *logrus.Entry {
 
 func (c *Context) GetConfig() *config.Config {
 	return GetConfig(c.req.Context())
+}
+
+func (c *Context) GetDb() *gorm.DB {
+	return GetDb(c.req.Context())
 }
 
 func (c *Context) GetOrigCorrelationId() string {

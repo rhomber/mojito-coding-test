@@ -23,13 +23,13 @@ func main() {
 	defer cleanup()
 
 	// Db init
-	boot.Sqlite3(*rollback)
+	db := boot.Sqlite3(*rollback)
 
 	// App
 	a := &app.Application{}
 
 	// Prepare Graph
-	core.Populate(a)
+	core.Populate(a, db)
 
 	// Prepare App
 	handlers, err := a.Init()

@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/go-chi/chi"
 	"github.com/sirupsen/logrus"
+	"gorm.io/gorm"
 	"mojito-coding-test/common/config"
 )
 
@@ -42,6 +43,16 @@ func GetServiceManager(ctx context.Context) ServiceManager {
 		return nil
 	}
 	if v, ok := ctx.Value(CtxKeyServiceManager).(ServiceManager); ok {
+		return v
+	}
+	return nil
+}
+
+func GetDb(ctx context.Context) *gorm.DB {
+	if ctx == nil {
+		return nil
+	}
+	if v, ok := ctx.Value(CtxKeyDb).(*gorm.DB); ok {
 		return v
 	}
 	return nil

@@ -11,6 +11,7 @@ const configFilePrefix string = "config"
 var Logrus = newLogger()
 var Logger *logrus.Entry // Set during boot.
 var Config = newConfig()
+var Validator = newValidator()
 
 func newLogger() *logrus.Logger {
 	return logrus.New()
@@ -30,6 +31,7 @@ func Populate(values ...interface{}) {
 	values = append(values, Logrus)
 	values = append(values, Logger)
 	values = append(values, Config)
+	values = append(values, Validator)
 
 	err := inject.Populate(values...)
 	if err != nil {

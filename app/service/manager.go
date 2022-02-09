@@ -1,10 +1,15 @@
 package service
 
-import "mojito-coding-test/common/config"
+import (
+	"gorm.io/gorm"
+	"mojito-coding-test/common/config"
+)
 
 type Manager struct {
 	// Facilities
 	Config *config.Config `inject:""`
+	Db     *gorm.DB       `inject:""`
 
 	// Services
+	User *User `inject:""`
 }

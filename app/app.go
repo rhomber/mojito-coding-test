@@ -2,6 +2,8 @@ package app
 
 import (
 	"github.com/sirupsen/logrus"
+	"gorm.io/gorm"
+	"mojito-coding-test/app/handler"
 	"mojito-coding-test/app/handler/health"
 	"mojito-coding-test/app/service"
 	"mojito-coding-test/common/chttp"
@@ -12,6 +14,7 @@ import (
 type Application struct {
 	Config         *config.Config   `inject:""`
 	Logger         *logrus.Entry    `inject:""`
+	Db             *gorm.DB         `inject:""`
 	ServiceManager *service.Manager `inject:""`
 }
 
@@ -28,6 +31,7 @@ func (a *Application) InitHandlers() (*chttp.Router, error) {
 	r := chttp.NewRouter()
 
 	cmiddleware.Init(r, a.ServiceManager).
+		WithDb(a.Db).
 		Each(cmiddleware.MountPoints{
 			"/":         false,
 			"/api/test": true,
@@ -51,5 +55,5 @@ func (a *Application) initRoutes(r *chttp.Router, isExternal bool) {
 }
 
 func (a *Application) initPublicRoutes(r *chttp.Router, isExternal bool) {
-
+	r.Post("/user", handler.PostUser)
 }

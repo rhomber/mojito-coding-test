@@ -6,11 +6,14 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/pkg/errors"
 	"github.com/pressly/goose/v3"
+	"gorm.io/driver/sqlite"
+	"gorm.io/gorm"
+	"gorm.io/gorm/schema"
 	"mojito-coding-test/common/core"
 	"os"
 )
 
-func Sqlite3(rollback bool) {
+func Sqlite3(rollback bool) *gorm.DB {
 	if err := migrateSqlite3Db(rollback); err != nil {
 		core.Logger.Fatalf("failed to init db - %+v", err)
 	}
@@ -19,6 +22,18 @@ func Sqlite3(rollback bool) {
 		// Exit after rollback.
 		os.Exit(0)
 	}
+
+	// Init Gorm
+	db, err := gorm.Open(sqlite.Open(core.Config.GetDbFile()), &gorm.Config{
+		NamingStrategy: schema.NamingStrategy{
+			SingularTable: true,
+		},
+	})
+	if err != nil {
+		core.Logger.Fatalf("failed to connect to db - %+v", err)
+	}
+
+	return db
 }
 
 func migrateSqlite3Db(rollback bool) error {

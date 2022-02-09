@@ -2,6 +2,7 @@ package middleware
 
 import (
 	chim "github.com/go-chi/chi/middleware"
+	"gorm.io/gorm"
 	"mojito-coding-test/common/chttp"
 	"mojito-coding-test/common/chttp/handler"
 	"mojito-coding-test/common/core"
@@ -34,6 +35,12 @@ func Init(r *chttp.Router, sm chttp.ServiceManager) *initializer {
 		r:           r,
 		middlewares: middlewares,
 	}
+}
+
+func (i *initializer) WithDb(db *gorm.DB) *initializer {
+	i.middlewares = append(i.middlewares, SetDb(db))
+
+	return i
 }
 
 func (i *initializer) Each(mps MountPoints, handlerCb func(r *chttp.Router, mount string, isExternal bool)) {
