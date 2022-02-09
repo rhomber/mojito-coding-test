@@ -12,6 +12,7 @@ type CreateAuctionLotBid struct {
 
 type CreateAuctionLotBidResult struct {
 	Success      bool          `json:"success" yaml:"success"`
+	Id           uint          `json:"id,omitempty" yaml:"id,omitempty"`
 	AuctionLotId uint          `json:"auction_lot_id,omitempty" yaml:"auction_lot_id,omitempty"`
 	UserId       uint          `json:"user_id,omitempty" yaml:"user_id,omitempty"`
 	Type         types.BidType `json:"type,omitempty" yaml:"type,omitempty"`

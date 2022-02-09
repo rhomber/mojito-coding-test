@@ -33,6 +33,7 @@ func CreateAuctionLotBidResultModelToDTO(success bool, bidEntity model.AuctionLo
 
 	res := dto.CreateAuctionLotBidResult{
 		Success:      success,
+		Id:           bidEntity.ID,
 		AuctionLotId: bidEntity.AuctionLotId,
 		UserId:       bidEntity.UserId,
 		Type:         bidEntity.Type,

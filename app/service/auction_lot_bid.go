@@ -3,6 +3,7 @@ package service
 import (
 	"fmt"
 	"github.com/pkg/errors"
+	"github.com/sirupsen/logrus"
 	"gopkg.in/go-playground/validator.v9"
 	"gorm.io/gorm"
 	"mojito-coding-test/app/data/dto"
@@ -16,6 +17,7 @@ import (
 
 type AuctionLotBid struct {
 	// Facilities
+	Logger    *logrus.Entry       `inject:""`
 	Config    *config.Config      `inject:""`
 	Db        *gorm.DB            `inject:""`
 	Validator *validator.Validate `inject:""`
@@ -129,6 +131,8 @@ func (s *AuctionLotBid) Create(db *gorm.DB, auth cdto.Auth, auctionLotId uint,
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			// No bids, proceed.
+			s.Logger.Tracef("bid success(0): no current bids")
+
 			return s.doCreate(db, auth.UserId, auctionLotId, entityDTO.Bid, entityDTO.MaxBid,
 				types.BidTypeUser, true, true)
 		}
@@ -143,20 +147,55 @@ func (s *AuctionLotBid) Create(db *gorm.DB, auth cdto.Auth, auctionLotId uint,
 		}
 	}
 
+	// Is already current bidder?
+	if curBid.UserId == auth.UserId {
+		if entityDTO.MaxBid != maxBid.MaxBid {
+			// Update the max bid.
+			s.Logger.Tracef("success(1): update max bid only")
+
+			maxBid, err = s.doCreateMaxBid(db, auth.UserId, auctionLotId, entityDTO.MaxBid)
+			if err != nil {
+				return dto.CreateAuctionLotBidResult{}, err
+			}
+		}
+
+		return adapter.CreateAuctionLotBidResultModelToDTO(true, curBid, maxBid), nil
+	}
+
+	// Are the bids greater than the current bid?
+	if entityDTO.Bid <= curBid.Bid && entityDTO.MaxBid <= curBid.Bid {
+		s.Logger.Tracef("bid failure(0): neither bid nor max bid is greater than current bid")
+
+		return adapter.CreateAuctionLotBidResultModelToDTO(false, curBid, maxBid), nil
+	}
+
+	// Have been outbid?
 	if entityDTO.Bid > curBid.Bid {
 		if entityDTO.Bid > maxBid.MaxBid {
 			// Greater than both the current bid and the max bid.
+			s.Logger.Tracef("bid success(2): bid %d is greater than current max bid %d",
+				entityDTO.Bid, maxBid.MaxBid)
+
 			return s.doCreate(db, auth.UserId, auctionLotId, entityDTO.Bid, entityDTO.MaxBid,
 				types.BidTypeUser, true, true)
-		} else {
+		} else if maxBid.MaxBid >= entityDTO.MaxBid {
 			// Greater than current bid but not the max bid.
-			return s.doCreate(db, curBid.UserId, auctionLotId, entityDTO.Bid, maxBid.MaxBid,
+			s.Logger.Tracef("bid failure(3): current max bid %d exceeds submitted max bid %d",
+				maxBid.MaxBid, entityDTO.Bid)
+
+			return s.doCreate(db, curBid.UserId, auctionLotId, entityDTO.MaxBid, maxBid.MaxBid,
 				types.BidTypeMaxBid, false, false)
 		}
-	} else if entityDTO.MaxBid > curBid.Bid {
+	}
+
+	// Fall-through: check max bid
+	if entityDTO.MaxBid > curBid.Bid {
 		if entityDTO.MaxBid > maxBid.MaxBid {
 			if entityDTO.MaxBid >= maxBid.MaxBid+bidIncrement {
 				// Max bid is greater than the current bid and the max bid.
+				s.Logger.Tracef("bid success(4): submitted max %d exceeds current max %d",
+					entityDTO.MaxBid, maxBid.MaxBid)
+
 				return s.doCreate(db, auth.UserId, auctionLotId, maxBid.MaxBid+bidIncrement, entityDTO.MaxBid,
 					types.BidTypeMaxBid, true, true)
 			} else {
@@ -165,6 +204,9 @@ func (s *AuctionLotBid) Create(db *gorm.DB, auth cdto.Auth, auctionLotId uint,
 			}
 		} else {
 			// Not greater than the current bidders max bid.
+			s.Logger.Tracef("bid failure(5): current max bid %d exceeds submitted max bid %d",
+				maxBid.MaxBid, entityDTO.MaxBid)
+
 			return s.doCreate(db, curBid.UserId, auctionLotId, entityDTO.MaxBid, maxBid.MaxBid,
 				types.BidTypeMaxBid, false, false)
 		}
@@ -176,6 +218,7 @@ func (s *AuctionLotBid) Create(db *gorm.DB, auth cdto.Auth, auctionLotId uint,
 func (s *AuctionLotBid) doCreate(db *gorm.DB, userId, auctionLotId, bid, maxBid uint,
 	bidType types.BidType, setMax, success bool) (dto.CreateAuctionLotBidResult, error) {
 
+	var err error
 	var bidEntity model.AuctionLotBid
 	var maxBidEntity = model.AuctionLotBidMax{
 		MaxBid: maxBid,
@@ -195,27 +238,40 @@ func (s *AuctionLotBid) doCreate(db *gorm.DB, userId, auctionLotId, bid, maxBid 
 
 	/// Insert Max Bid
 	if setMax {
-		// Reset Active
-		if err := resetMaxBid(db, auctionLotId, userId); err != nil {
+		maxBidEntity, err = s.doCreateMaxBid(db, userId, auctionLotId, maxBid)
+		if err != nil {
 			return dto.CreateAuctionLotBidResult{}, err
-		}
-
-		if maxBid > 0 {
-			// Insert
-			maxBidEntity = model.AuctionLotBidMax{
-				AuctionLotId: auctionLotId,
-				UserId:       userId,
-				MaxBid:       maxBid,
-				Active:       true,
-			}
-
-			if err := db.Create(&maxBidEntity).Error; err != nil {
-				return dto.CreateAuctionLotBidResult{}, err
-			}
 		}
 	}
 
 	return adapter.CreateAuctionLotBidResultModelToDTO(success, bidEntity, maxBidEntity), nil
+}
+
+func (s *AuctionLotBid) doCreateMaxBid(db *gorm.DB, userId, auctionLotId, maxBid uint) (model.AuctionLotBidMax, error) {
+	var maxBidEntity = model.AuctionLotBidMax{
+		MaxBid: maxBid,
+	}
+
+	// Reset Active
+	if err := resetMaxBid(db, auctionLotId, userId); err != nil {
+		return model.AuctionLotBidMax{}, err
+	}
+
+	if maxBid > 0 {
+		// Insert
+		maxBidEntity = model.AuctionLotBidMax{
+			AuctionLotId: auctionLotId,
+			UserId:       userId,
+			MaxBid:       maxBid,
+			Active:       true,
+		}
+
+		if err := db.Create(&maxBidEntity).Error; err != nil {
+			return model.AuctionLotBidMax{}, err
+		}
+	}
+
+	return maxBidEntity, nil
 }
 
 // Util

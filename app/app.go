@@ -65,8 +65,11 @@ func (a *Application) initPublicRoutes(r *chttp.Router, isExternal bool) {
 		r.Get("/", handler.GetAuctionLots)
 		r.Post("/", handler.PostAuctionLot)
 
-		r.Route("/{id}/bid", func(r *chttp.Router) {
+		r.Route("/{auctionLotId}/bid", func(r *chttp.Router) {
 			r.Use(middleware.AuthRequired)
+
+			r.Get("/", handler.GetAuctionLotBids)
+			r.Post("/", handler.PostAuctionLotBid)
 		})
 	})
 }
