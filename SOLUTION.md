@@ -11,6 +11,8 @@ The __README__ file contains the relevant notes needed to build and run the proj
 ## Postman Collection
 
 I have saved an export of a __Postman__ collection you can use to test the project under the __testing__ directory.
+You will also want to define two environment variables __auctionLotId__ and __authUserEmail__ (an email for a user
+you created).
 
 # Structure
 
@@ -112,3 +114,9 @@ I have also introduced a __type__ column to distinguish between __user__ generat
 
 As the project took considerably longer than I was expecting I have opted for adding unit tests only to one service.
 I feel that regardless of time constraints code such as this, with many possible outcomes, should be thoroughly tested.
+
+## Repository
+
+In the past I have also included another layer beyond the service for access to the database (repository). This isn't
+what I have been doing lately in my projects as I found the repository and service layers had too much overlap. But
+I can see the benefits of having it, if that's what you are using.

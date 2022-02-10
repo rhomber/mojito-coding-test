@@ -22,3 +22,9 @@ go build
 chmod +x mojito-coding-test
 ./mojito-coding-test
 ```
+
+## Testing
+
+```
+go test ./...
+```

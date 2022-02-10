@@ -162,13 +162,6 @@ func (s *AuctionLotBid) Create(db *gorm.DB, auth cdto.Auth, auctionLotId uint,
 		return adapter.CreateAuctionLotBidResultModelToDTO(true, curBid, maxBid), nil
 	}
 
-	// Are the bids greater than the current bid?
-	if entityDTO.Bid <= curBid.Bid && entityDTO.MaxBid <= curBid.Bid {
-		s.Logger.Tracef("bid failure(0): neither bid nor max bid is greater than current bid")
-
-		return adapter.CreateAuctionLotBidResultModelToDTO(false, curBid, maxBid), nil
-	}
-
 	// Have been outbid?
 	if entityDTO.Bid > curBid.Bid {
 		if entityDTO.Bid > maxBid.MaxBid {
@@ -179,7 +172,6 @@ func (s *AuctionLotBid) Create(db *gorm.DB, auth cdto.Auth, auctionLotId uint,
 			return s.doCreate(db, auth.UserId, auctionLotId, entityDTO.Bid, entityDTO.MaxBid,
 				types.BidTypeUser, true, true)
 		} else if maxBid.MaxBid >= entityDTO.MaxBid {
-			// Greater than current bid but not the max bid.
 			s.Logger.Tracef("bid failure(3): current max bid %d exceeds submitted max bid %d",
 				maxBid.MaxBid, entityDTO.Bid)
 
@@ -188,29 +180,22 @@ func (s *AuctionLotBid) Create(db *gorm.DB, auth cdto.Auth, auctionLotId uint,
 		}
 	}
 
-	// Fall-through: check max bid
-	if entityDTO.MaxBid > curBid.Bid {
-		if entityDTO.MaxBid > maxBid.MaxBid {
-			if entityDTO.MaxBid >= maxBid.MaxBid+bidIncrement {
-				// Max bid is greater than the current bid and the max bid.
-				s.Logger.Tracef("bid success(4): submitted max %d exceeds current max %d",
-					entityDTO.MaxBid, maxBid.MaxBid)
+	if entityDTO.MaxBid > curBid.Bid && entityDTO.MaxBid > maxBid.MaxBid {
+		if entityDTO.MaxBid >= maxBid.MaxBid+bidIncrement {
+			// Max bid is greater than the current bid and the max bid.
+			s.Logger.Tracef("bid success(4): submitted max %d exceeds current max %d",
+				entityDTO.MaxBid, maxBid.MaxBid)
 
-				return s.doCreate(db, auth.UserId, auctionLotId, maxBid.MaxBid+bidIncrement, entityDTO.MaxBid,
-					types.BidTypeMaxBid, true, true)
-			} else {
-				// I would normally add a lot more detail to this error message.
-				return dto.CreateAuctionLotBidResult{}, fmt.Errorf("expected max bid to be sufficient")
-			}
+			return s.doCreate(db, auth.UserId, auctionLotId, maxBid.MaxBid+bidIncrement, entityDTO.MaxBid,
+				types.BidTypeMaxBid, true, true)
 		} else {
-			// Not greater than the current bidders max bid.
-			s.Logger.Tracef("bid failure(5): current max bid %d exceeds submitted max bid %d",
-				maxBid.MaxBid, entityDTO.MaxBid)
-
-			return s.doCreate(db, curBid.UserId, auctionLotId, entityDTO.MaxBid, maxBid.MaxBid,
-				types.BidTypeMaxBid, false, false)
+			// Should never occur.
+			return dto.CreateAuctionLotBidResult{}, fmt.Errorf("expected max bid to be "+
+				"sufficient (%d is not gte %d+%d)", entityDTO.MaxBid, maxBid.MaxBid, bidIncrement)
 		}
 	}
+
+	s.Logger.Tracef("bid failure(5): neither bid nor max bid is greater than current bid")
 
 	return adapter.CreateAuctionLotBidResultModelToDTO(false, curBid, maxBid), nil
 }

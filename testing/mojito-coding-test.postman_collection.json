@@ -1,0 +1,231 @@
+{
+	"info": {
+		"_postman_id": "a02265bb-8934-4a5c-905d-f782bed99f31",
+		"name": "mojito-coding-test",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "User",
+			"item": [
+				{
+					"name": "/v1/user",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"first_name\": \"A\",\n    \"last_name\": \"User\",\n    \"email\": \"a-user@mojito.xyz\"\n}"
+						},
+						"url": {
+							"raw": "http://localhost:8080/v1/user",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"v1",
+								"user"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/v1/user",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "http://localhost:8080/v1/user",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"v1",
+								"user"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Auction Lot",
+			"item": [
+				{
+					"name": "/v1/auction/lot",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Disco Punk\",\n    \"start_time\": \"2022-02-08T09:00:00Z\",\n    \"end_time\": \"2022-02-10T09:00:00Z\"\n}"
+						},
+						"url": {
+							"raw": "http://localhost:8080/v1/auction/lot",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"v1",
+								"auction",
+								"lot"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/v1/auction/lot",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "http://localhost:8080/v1/auction/lot",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"v1",
+								"auction",
+								"lot"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Auction Lot Bid",
+			"item": [
+				{
+					"name": "/v1/auction/lot/{id}/bid",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "X-User-Auth",
+								"value": "{{authUserEmail}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"bid\": 100,\n    \"max_bid\": 300\n}"
+						},
+						"url": {
+							"raw": "http://localhost:8080/v1/auction/lot/{{auctionLotId}}/bid",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"v1",
+								"auction",
+								"lot",
+								"{{auctionLotId}}",
+								"bid"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/v1/auction/lot/{id}/bid",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "X-User-Auth",
+								"value": "{{authUserEmail}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "http://localhost:8080/v1/auction/lot/{{auctionLotId}}/bid",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"v1",
+								"auction",
+								"lot",
+								"{{auctionLotId}}",
+								"bid"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
